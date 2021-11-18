@@ -36,3 +36,6 @@ override.tf.json
 terraform.rc
 credentials.json
 .terraform.lock.hcl
+tmp
+venv
+log.log

@@ -1,5 +1,3 @@
-
-
 terraform {
   required_providers {
     google = {
@@ -20,13 +18,13 @@ terraform {
 provider google {
   project = var.project_id
   region = var.region
-  credentials = file(var.gcp_auth_file)
+  credentials = fileexists(var.gcp_auth_file) ? file(var.gcp_auth_file) : null
 }
 
 provider "google-beta" {
   project = var.project_id
   region = var.region  
-  credentials = file(var.gcp_auth_file)
+  credentials = fileexists(var.gcp_auth_file) ? file(var.gcp_auth_file) : null
 }
 
 provider "null" {}
@@ -47,6 +45,7 @@ module "project-services" {
   activate_apis = [
     "compute.googleapis.com",
     "iam.googleapis.com",
+    "orgpolicy.googleapis.com"
   ]
 }
 

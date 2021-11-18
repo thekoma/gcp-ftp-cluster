@@ -15,8 +15,26 @@ resource "google_compute_firewall" "ftp-firewall-in" {
 }
 
 
-resource "google_compute_firewall" "ftp-firewall-out" {
-  name    = "ftp-firewall-out"
+resource "google_compute_firewall" "admin-firewall-in" {
+  name    = "admin-firewall-in"
+  network = var.network_name
+  direction = "INGRESS"
+  allow {
+    protocol = "icmp"
+  }
+
+  allow {
+    protocol = "tcp"
+    ports    = ["22"]
+  }
+  source_ranges = var.source_ranges
+  target_tags = ["admin"]
+}
+
+
+
+resource "google_compute_firewall" "any-firewall-out" {
+  name    = "any-firewall-out"
   network = var.network_name
   direction = "EGRESS"
   allow {
@@ -29,7 +47,6 @@ resource "google_compute_firewall" "ftp-firewall-out" {
   }
 
   destination_ranges = ["0.0.0.0/0"]
-  target_tags = ["ftp"]
 }
 
 resource "google_compute_router" "router" {
