@@ -39,3 +39,4 @@ credentials.json
 tmp
 venv
 log.log
+_custom.tf

@@ -12,6 +12,7 @@ resource "google_compute_firewall" "ftp-firewall-in" {
   }
   source_ranges = ["0.0.0.0/0"]
   target_tags = ["ftp"]
+  depends_on = [ google_compute_network.vpc_network ]
 }
 
 
@@ -25,13 +26,55 @@ resource "google_compute_firewall" "admin-firewall-in" {
 
   allow {
     protocol = "tcp"
-    ports    = ["22"]
+    ports    = ["22", "80", "443", "21", "8080", "2121", "2021", "2020" ]
   }
   source_ranges = var.source_ranges
-  target_tags = ["admin"]
+  
+  depends_on = [ google_compute_network.vpc_network ]
+}
+
+###########
+resource "google_compute_firewall" "bastion-firewall-machines-from" {
+  name    = "bastion-machines-can-to-machines"
+  network = var.network_name
+  direction = "INGRESS"
+  allow {
+    protocol = "all"
+  }
+  source_tags = ["bastion"]
+  depends_on = [ google_compute_network.vpc_network ]
 }
 
 
+resource "google_compute_firewall" "bastion-firewall-machines-to" {
+
+  name    = "bastion-machines-can-to-any"
+  network = var.network_name
+  direction = "EGRESS"
+  allow {
+    protocol = "all"
+  }
+  destination_ranges = ["0.0.0.0/0"]
+  target_tags = ["bastion"]
+  depends_on = [ google_compute_network.vpc_network ]
+}
+##########
+
+
+
+resource "google_compute_firewall" "ftp-machines-high" {
+
+  name    = "ftp-machines-high"
+  network = var.network_name
+  direction = "EGRESS"
+  allow {
+    protocol = "TCP"
+    ports = [ "1024-65534" ]
+  }
+  destination_ranges = ["0.0.0.0/0"]
+  target_tags = ["ftp"]
+  depends_on = [ google_compute_network.vpc_network ]
+}
 
 resource "google_compute_firewall" "any-firewall-out" {
   name    = "any-firewall-out"
@@ -43,23 +86,9 @@ resource "google_compute_firewall" "any-firewall-out" {
   
   allow {
     protocol = "tcp"
-    ports    = ["80", "443"]
+    ports    = ["80", "443", "3306"]
   }
 
   destination_ranges = ["0.0.0.0/0"]
-}
-
-resource "google_compute_router" "router" {
-  project = var.project_id
-  name    = "nat-router"
-  network = var.network_name
-  region  = var.region
-}
-
-module "cloud-nat" {
-  source     = "terraform-google-modules/cloud-nat/google"
-  version    = "~> 1.2"
-  project_id = var.project_id
-  region     = var.region
-  router     = google_compute_router.router.name
+  depends_on = [ google_compute_network.vpc_network ]
 }

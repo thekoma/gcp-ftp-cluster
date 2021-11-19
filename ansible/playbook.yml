@@ -1,0 +1,102 @@
+---
+- name: "Configure host"
+  hosts: 127.0.0.1
+  connection: local
+  become: yes
+  vars:
+    workdir: "/opt/sftpgo"
+    image: "drakkan/sftpgo:edge-alpine"
+  handlers:
+    - name: reload-sftpgo
+      shell: |
+        docker-compose -f {{ workdir }}/docker-compose.yaml restart
+  tasks:
+    - name: Ensure this playbook is updated costantly (also as first step so that we can retry)
+      ansible.builtin.cron:
+        name: "Update confs"
+        minute: "0,15,30,45"
+        hour: "*"
+        job: "sh -c /opt/rerun.sh >/dev/null"
+        user: root
+    - name: Update the reconfiguration script
+      ansible.builtin.template:
+        src: runme.sh.j2
+        dest: "/opt/rerun.sh"
+        owner: '0'
+        group: '0'
+        mode: '0755'
+    - name: Check if {{ workdir}} exists
+      stat:
+        path: "{{ workdir}}"
+      register: register_name
+    - name: "Install utils"
+      when: not register_name.stat.exists
+      tags: [ "always" ]    
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+        pkg:
+        - htop
+        - ncdu
+        - wget
+        - jq
+        - docker
+        - docker-compose
+        - expect
+
+    - name: Create sftpgo directory
+      loop:
+        - "{{workdir}}"
+        - "{{workdir}}/home"
+        - "{{workdir}}/data"
+      ansible.builtin.file:
+        path: "{{item}}"
+        state: directory
+        mode: '0755'
+        owner: '1000'
+        group: '1000'
+        recurse: yes
+    - name: gather LB ip
+      shell: gcloud compute forwarding-rules describe ftp-ip --region=us-central1 --format=json |jq -r '.IPAddress'
+      register: lb
+      
+    - name: gather sqluser
+      shell: gcloud secrets versions access  latest --secret="sqlusername"
+      register: sqluser
+
+    - name: gather sqlppass
+      shell: gcloud secrets versions access  latest --secret="sqlppass"
+      register: sqlppass
+
+    - name: gather sqlhost
+      shell: gcloud secrets versions access  latest --secret="sqlhost"
+      register: sqlhost
+
+    - name: gather cookie key
+      shell: gcloud secrets versions access  latest --secret="cookie_key"
+      register: cookie_key
+
+    - name: Update the configuration
+      notify:
+        - 'reload-sftpgo'
+      ansible.builtin.template:
+        src: sftpgo.json.j2
+        dest: "{{workdir}}/sftpgo.json"
+        mode: '0644'
+        owner: '1000'
+        group: '1000'
+
+    - name: Update the configuration
+      notify:
+        - 'reload-sftpgo'
+      ansible.builtin.template:
+        src: docker-compose.yaml.j2
+        dest: "{{workdir}}/docker-compose.yaml"
+        owner: '1000'
+        group: '1000'
+        mode: '0640'
+
+    - name: start-update docker
+      shell: |
+        docker-compose -f {{ workdir }}/docker-compose.yaml up -d
+

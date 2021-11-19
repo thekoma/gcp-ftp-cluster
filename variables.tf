@@ -6,9 +6,22 @@ variable zone {
   default = "us-central1-b"
 }
 
+
+variable machine_type_bastion {
+  default = "e2-standard-4"
+}
+
+variable machine_type_ftp {
+  default = "e2-standard-4"
+}
 variable project_name {
   default = "An FTP Project"
 }
+
+variable folder_id {
+  default = null
+}
+
 
 variable network {
   default = "default"
@@ -31,23 +44,19 @@ variable billing_account {
 variable "gcp_auth_file" {
   type        = string
   description = "GCP authentication file"
-  default = "${path.module}/credentials.json"
+  default = "./credentials.json"
 }
 
 variable "network_name" {
   default = "default"
 }
 
+# Note this is the monitoring range of google. Do not remove it
 variable "source_ranges" {
   type    = list(string)
-  default = ["35.235.240.0/20"]
+  default = [ "35.191.0.0/16", "130.211.0.0/22" ]
 }
 
-# variable "ssh_keys" {
-#   type    = string
-#   default = <<EOF
-#       dev:ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILg6UtHDNyMNAh0GjaytsJdrUxjtLy3APXqZfNZhvCeT dev
-#       foo:ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILg6UtHDNyMNAh0GjaytsJdrUxjtLy3APXqZfNZhvCeT bar
-#     EOF
-# }
-
+variable "sqlusername" {
+  default = "sftpgo"
+}

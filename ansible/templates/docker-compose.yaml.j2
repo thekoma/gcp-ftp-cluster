@@ -1,0 +1,21 @@
+---
+version: "3"
+services:
+  sftpgo:
+    image: {{ image }}
+    container_name: sftpgo
+    environment:
+      - SFTPGO_FTPD__BINDINGS__0__PORT=2121
+    restart: always
+    ports:
+      - 80:8080
+      - 2022:2022
+      - 21:21
+      - 20:20
+      - 50000-50100:50000-50100
+    cap_add:
+      - ALL
+    volumes:
+      - {{workdir}}/sftpgo.json:/var/lib/sftpgo/sftpgo.json:ro
+      - {{workdir}}/data:/srv/sftpgo
+      - {{workdir}}/home:/var/lib/sftpgo
