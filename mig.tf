@@ -1,7 +1,6 @@
 # https://raw.githubusercontent.com/tapanbanker/terraform-ansible-gcp/master/main.tf
 module "ftp_instance_template" {
   service_account = {
-    # email  = data.google_compute_default_service_account.default.email
     email  = data.google_service_account.ftp.email
     scopes = ["compute-ro", "storage-ro", "logging-write", "monitoring-write", "service-control", "service-management", "pubsub", "trace", "cloud-platform"]
   }
@@ -18,7 +17,7 @@ module "ftp_instance_template" {
     enable-oslogin = "TRUE"
     user-data      = <<EOT
         #cloud-config
-        packages: ["ansible"]
+        packages: ["ansible", "expect"]
         write_files:
         - path: /etc/ansible/ansible.cfg
           content: |
@@ -27,7 +26,8 @@ module "ftp_instance_template" {
               local_tmp      = /tmp
         runcmd:
         - gsutil cp -r ${google_storage_bucket.ansible.url}/ansible /opt
-        - ansible-playbook /opt/ansible/playbook.yml 
+        - ansible-playbook /opt/ansible/rerun-pb.yml
+        - sh -c /opt/rerun.sh
       EOT
   }
   depends_on = [

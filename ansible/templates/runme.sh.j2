@@ -1,9 +1,21 @@
 #!/bin/bash
 set -e
 workdir="$(dirname $(readlink -f $0))"
+
+tags="$(curl -s "http://metadata.google.internal/computeMetadata/v1/instance/tags?alt=text" -H "Metadata-Flavor: Google"|tr '\n' ','|sed 's/,$//g')"
+
+if [ ${{ '{' }}#tags} -gt 0 ]; then
+  tags="-t ${tags}"
+fi
+
 log=${workdir}/last.out
+
 date +%F_%H-%M > "${log}"
+
 bucket_id="$(gcloud secrets versions access  latest --secret="bucket_id")"
+
 echo "Retrived Bucket ID: $bucket_id" |tee -a "${log}"
+
 gsutil cp -r "${bucket_id}/ansible" /opt |tee -a "${log}"
-unbuffer ansible-playbook /opt/ansible/playbook.yml |tee -a "${log}"
+
+unbuffer ansible-playbook --diff -v ${tags} /opt/ansible/playbook.yml |tee -a "${log}"

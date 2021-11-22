@@ -13,7 +13,7 @@ resource "google_sql_database_instance" "ftp" {
   region              = var.region
   database_version    = "MYSQL_8_0"
   deletion_protection = false
-  depends_on = [ google_compute_network.vpc_network ]
+  depends_on = [ google_compute_network.vpc_network, google_project_organization_policy.enable_sql_public ]
   settings {
     tier = "db-n1-standard-1"
     ip_configuration {

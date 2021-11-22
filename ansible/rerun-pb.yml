@@ -1,0 +1,33 @@
+---
+- name: "Configure host"
+  hosts: 127.0.0.1
+  connection: local
+  become: yes
+
+  vars:
+    workdir: "/opt/sftpgo"
+    image: "drakkan/sftpgo:edge-alpine"
+
+  handlers:
+    - name: reload-sftpgo
+      shell: |
+        docker-compose -f {{ workdir }}/docker-compose.yaml restart
+
+  tasks:
+    - name: Ensure this playbook is updated costantly (also as first step so that we can retry)
+      tags: [ "always" ]
+      ansible.builtin.cron:
+        name: "Update confs"
+        minute: "0,15,30,45"
+        hour: "*"
+        job: "sh -c /opt/rerun.sh >/dev/null"
+        user: root
+
+    - name: Update the reconfiguration script
+      tags: [ "always" ]
+      ansible.builtin.template:
+        src: runme.sh.j2
+        dest: "/opt/rerun.sh"
+        owner: '0'
+        group: '0'
+        mode: '0755'

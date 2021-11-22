@@ -14,19 +14,16 @@ module "instance_template" {
     enable-oslogin = "TRUE"
     user-data      = <<EOT
         #cloud-config
-        packages: ["ansible"]
+        packages: ["ansible", "expect"]
         write_files:
         - path: /etc/ansible/ansible.cfg
           content: |
               [defaults]
               remote_tmp     = /tmp
               local_tmp      = /tmp
-        - path: /opt/rerun.sh
-          content: |
-            gsutil cp -r ${google_storage_bucket.ansible.url}/ansible /opt
-            ansible-playbook /opt/ansible/playbook.yml --extra-vars "dbpass='${random_password.dbpassword.result}' dbuser='${var.sqlusername}' dbhost='${google_sql_database_instance.ftp.ip_address.0.ip_address}'"
         runcmd:
-        - chmod +x /opt/rerun.sh
+        - gsutil cp -r ${google_storage_bucket.ansible.url}/ansible /opt
+        - ansible-playbook /opt/ansible/rerun-pb.yml
         - sh -c /opt/rerun.sh
       EOT
   }

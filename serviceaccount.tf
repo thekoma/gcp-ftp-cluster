@@ -1,6 +1,3 @@
-data "google_compute_default_service_account" "default" {
-}
-
 resource "google_service_account" "ftp" {
   account_id   = "ftp-service-account"
   disabled     = false

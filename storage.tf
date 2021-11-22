@@ -21,17 +21,6 @@ resource "google_storage_bucket_object" "playbook" {
   ]
 }
 
-resource "google_project_iam_member" "bucket_viewer" {
-  project = "${var.project_id}-${random_id.project.hex}"
-  role    = "roles/storage.objectViewer"
-  member = "serviceAccount:${data.google_compute_default_service_account.default.email}"
-  depends_on = [
-    module.project-services,
-    google_storage_bucket_object.playbook,
-    data.google_compute_default_service_account.default
-  ]
-}
-
 resource "google_project_iam_member" "bucket_viewer_ftp" {
   project = "${var.project_id}-${random_id.project.hex}"
   role    = "roles/storage.objectViewer"
