@@ -61,7 +61,7 @@ resource "google_secret_manager_secret_iam_member" "sqlhost_member" {
   secret_id = google_secret_manager_secret.sqlhost.secret_id
   role = "roles/secretmanager.secretAccessor"
   member = "serviceAccount:${data.google_service_account.ftp.email}"
-  depends_on = [ data.google_service_account.ftp, google_secret_manager_secret.sqlhost.secret_id ]
+  depends_on = [ data.google_service_account.ftp, google_secret_manager_secret.sqlhost ]
 }
 
 # DB Password
