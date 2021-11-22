@@ -1,17 +1,8 @@
 terraform {
   required_providers {
-    google = {
-      # version = "~> 3.30"
-    }
-    google-beta = {
-      # version = "~> 3.38"
-    }
-    null = {
-      # version = "~> 2.1"
-    }
-    random = {
-      # version = "~> 2.2"
-    }
+    google-beta = {}
+    null = {}
+    random = {}
     time = {}
   }
 }
@@ -45,7 +36,6 @@ data "google_billing_account" "acct" {
 
 module "project-services" {
   source  = "terraform-google-modules/project-factory/google"
-  # version = "~> 10.1"
   project_id              = "${var.project_id}-${random_id.project.hex}"
   folder_id               = var.folder_id
   name                    = var.project_name

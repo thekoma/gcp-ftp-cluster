@@ -35,7 +35,6 @@ module "ftp_instance_template" {
     google_storage_bucket.ansible,
     google_compute_network.vpc_network,
     google_project_iam_member.sa_iap_admin,
-    data.google_compute_default_service_account.default,
     data.google_service_account.ftp
   ]
 }
@@ -43,14 +42,12 @@ module "ftp_instance_template" {
 
 module "ftp_mig" {
   source              = "terraform-google-modules/vm/google//modules/mig"
-  # version             = "~> 2.1.0"
   instance_template   = module.ftp_instance_template.self_link
   region              = var.region
   autoscaling_enabled = true
   target_size         = 3
   project_id          = "${var.project_id}-${random_id.project.hex}"
   hostname            = "ftp"
-  # target_tags         = [ "ftp" ]
   depends_on = [
     module.project-services,
     google_storage_bucket.ansible,
@@ -80,7 +77,6 @@ module "ftp_mig" {
 module "gce-lb-http" {
   count           = 0
   source            = "GoogleCloudPlatform/lb-http/google"
-  # version           = "~> 4.4"
   project           = "${var.project_id}-${random_id.project.hex}"
   name              = "group-http-lb"
   target_tags       = [ "ftp" ]

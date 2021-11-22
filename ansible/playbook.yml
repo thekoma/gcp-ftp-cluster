@@ -124,4 +124,3 @@
       tags: [ "always" ]
       shell: |
         docker-compose -f {{ workdir }}/docker-compose.yaml up -d
-
