@@ -38,5 +38,5 @@ credentials.json
 .terraform.lock.hcl
 tmp
 venv
-log.log
+*.log
 _custom.tf
