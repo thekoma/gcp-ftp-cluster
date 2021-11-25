@@ -31,11 +31,6 @@ resource "google_sql_database_instance" "ftp" {
   }
 }
 
-
-
-# output "ftp" {
-#   value = nonsensitive(google_sql_database_instance.ftp)
-# }
 resource "google_sql_database" "ftp" {
   name     = "ftp"
   instance = google_sql_database_instance.ftp.name

@@ -34,3 +34,14 @@ resource "google_project_organization_policy" "enable_sql_public" {
   }
 }
 
+resource "google_project_organization_policy" "peering" {
+  project    = "${var.project_id}-${random_id.project.hex}"
+  provider   = google-beta
+  constraint = "compute.restrictVpcPeering"
+  depends_on = [ google_project_iam_member.sa_iap_admin ]
+  list_policy {
+    allow {
+      all = true
+    }
+  }
+}

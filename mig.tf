@@ -2,7 +2,7 @@
 module "ftp_instance_template" {
   service_account = {
     email  = data.google_service_account.ftp.email
-    scopes = ["compute-ro", "storage-ro", "logging-write", "monitoring-write", "service-control", "service-management", "pubsub", "trace", "cloud-platform"]
+    scopes = ["compute-ro", "storage-rw", "logging-write", "monitoring-write", "service-control", "service-management", "pubsub", "trace", "cloud-platform"]
   }
   source               = "terraform-google-modules/vm/google//modules/instance_template"
   # version              = "~> 2.1.0"

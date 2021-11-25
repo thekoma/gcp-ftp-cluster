@@ -27,6 +27,7 @@ provider "google-beta" {
 
 output "project-id" {
   value = "Project ID: ${var.project_id}-${random_id.project.hex}"
+  sensitive = true
 }
 
 data "google_billing_account" "acct" {
@@ -48,7 +49,9 @@ module "project-services" {
     "oslogin.googleapis.com",
     "serviceusage.googleapis.com",
     "sqladmin.googleapis.com",
-    "secretmanager.googleapis.com"
+    "secretmanager.googleapis.com",
+    "file.googleapis.com",
+    "dns.googleapis.com"
   ]
 }
 

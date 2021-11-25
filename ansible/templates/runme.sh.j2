@@ -16,6 +16,6 @@ bucket_id="$(gcloud secrets versions access  latest --secret="bucket_id")"
 
 echo "Retrived Bucket ID: $bucket_id" |tee -a "${log}"
 
-gsutil cp -r "${bucket_id}/ansible" /opt |tee -a "${log}"
-
+gsutil -m cp -r "${bucket_id}/ansible" /opt |tee -a "${log}"
+unbuffer ansible-galaxy collection install ansible.posix |tee -a "${log}"
 unbuffer ansible-playbook --diff -v ${tags} /opt/ansible/playbook.yml |tee -a "${log}"

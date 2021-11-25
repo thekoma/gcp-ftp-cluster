@@ -19,12 +19,16 @@
 - Put all the sensible informations into secrets to prevent data leak
 - Configure sftpgo to work as passive FTP (most used way)
 - Use gsBucket as common storage interface thanks to sftpgo
+- Use filestore to user alternative common storage interface (NFS)
+- Create default configuration of SFTPgo
+- Create/Manage a DNS Zone to simplify connection
+- Added Recap Output
 
 ### Todo
 
-- Write an API call-out to configure the inner part of sftpgo
-- Create FileStore to produce a common datastore instead of gsBucket (to prove alternative way to customer)
-- Manage a DNS zone to provide a user readable access
+- ~~Write an API call-out to configure the inner part of sftpgo~~
+- ~~Create FileStore to produce a common datastore instead of gsBucket (to prove alternative way to customer)~~
+- ~~Manage a DNS zone to provide a user readable access~~
 
 ### Known Problems/Bugs
 

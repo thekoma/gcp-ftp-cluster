@@ -14,7 +14,7 @@ module "instance_template" {
     enable-oslogin = "TRUE"
     user-data      = <<EOT
         #cloud-config
-        packages: ["ansible", "expect"]
+        packages: ["ansible", "expect", "python3-passlib", "python3-bcrypt"]
         write_files:
         - path: /etc/ansible/ansible.cfg
           content: |
@@ -30,7 +30,7 @@ module "instance_template" {
   service_account = {
     email  = data.google_service_account.ftp.email
     # email  = data.google_compute_default_service_account.default.email
-    scopes = ["compute-ro", "storage-ro", "logging-write", "monitoring-write", "service-control", "service-management", "pubsub", "trace", "cloud-platform"]
+    scopes = ["compute-ro", "storage-rw", "logging-write", "monitoring-write", "service-control", "service-management", "pubsub", "trace", "cloud-platform"]
   }
   depends_on = [
     module.project-services,
@@ -66,6 +66,12 @@ module "bastion_instance" {
   } ]
   depends_on        = [
     module.instance_template,
-    data.google_compute_subnetwork.bastion-subnetwork
+    data.google_compute_subnetwork.bastion-subnetwork,
+    google_project_organization_policy.public_ip_for_vm
   ]
+}
+
+output "bastion" {
+  value = module.bastion_instance.instances_details[0].network_interface[0].access_config[0].nat_ip
+  sensitive = true
 }

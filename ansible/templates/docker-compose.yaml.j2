@@ -6,16 +6,19 @@ services:
     container_name: sftpgo
     environment:
       - SFTPGO_FTPD__BINDINGS__0__PORT=2121
+      - SFTPGO_LOADDATA_FROM=/var/lib/sftpgo/sftp-init.json
+      - SFTPGO_LOADDATA_MODE=0      
     restart: always
     ports:
       - 80:8080
       - 2022:2022
-      - 21:21
-      - 20:20
+      - 21:2121
       - 50000-50100:50000-50100
     cap_add:
       - ALL
     volumes:
       - {{workdir}}/sftpgo.json:/var/lib/sftpgo/sftpgo.json:ro
+      - {{workdir}}/sftp-init.json:/var/lib/sftpgo/sftp-init.json
       - {{workdir}}/data:/srv/sftpgo
       - {{workdir}}/home:/var/lib/sftpgo
+      - {{workdir}}/nfs:/nfs

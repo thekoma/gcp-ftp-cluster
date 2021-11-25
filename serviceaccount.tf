@@ -20,6 +20,11 @@ resource "google_project_iam_custom_role" "forwardingRulesSa" {
   description = ""
   permissions = ["compute.forwardingRules.list", "compute.forwardingRules.get"]
   project     = "${var.project_id}-${random_id.project.hex}"
+  depends_on = [
+    module.project-services,
+    google_project_iam_member.sa_iap_admin
+  ]
+  
 }
 
 resource "google_project_iam_member" "sa-forwardingRules" {
@@ -38,6 +43,17 @@ resource "google_project_iam_member" "view-secrets" {
   member = "serviceAccount:${data.google_service_account.ftp.email}"
   depends_on = [
     google_service_account.ftp,
+    google_project_iam_member.sa_iap_admin
+  ]
+}
+
+resource "google_project_iam_member" "object-admin" {
+  project = "${var.project_id}-${random_id.project.hex}"
+  role    = "roles/storage.objectAdmin"
+  member = "serviceAccount:${data.google_service_account.ftp.email}"
+  depends_on = [
+    google_service_account.ftp,
+    google_project_iam_member.sa_iap_admin
   ]
 }
 

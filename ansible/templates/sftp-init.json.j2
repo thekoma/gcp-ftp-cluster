@@ -1,0 +1,180 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "status": 1,
+      "username": "{{ftp_demo_user.stdout}}",
+      "expiration_date": 0,
+      "password": "{{ftp_demo_password.stdout}}",
+      "home_dir": "/srv/sftpgo/data/{{ftp_demo_user.stdout}}",
+      "public_keys": [
+        "{{ftp_demo_pubkey.stdout}}"
+      ],
+      "uid": 0,
+      "gid": 0,
+      "max_sessions": 0,
+      "quota_size": 0,
+      "quota_files": 0,
+      "permissions": {
+        "/": [
+          "*"
+        ],
+        "/gcs": [
+          "*"
+        ],
+        "/nfs": [
+          "*"
+        ]
+      },
+      "used_quota_size": 0,
+      "used_quota_files": 0,
+      "last_quota_update": 0,
+      "upload_bandwidth": 0,
+      "download_bandwidth": 0,
+      "last_login": 0,
+      "created_at": {{ansible_date_time.epoch}},
+      "updated_at": {{ansible_date_time.epoch}},
+      "filters": {
+        "tls_username": "None",
+        "hooks": {
+          "external_auth_disabled": false,
+          "pre_login_disabled": false,
+          "check_password_disabled": false
+        },
+        "totp_config": {
+          "secret": {}
+        }
+      },
+      "virtual_folders": [
+        {
+          "id": 1,
+          "name": "nfs",
+          "mapped_path": "/nfs",
+          "used_quota_size": 0,
+          "used_quota_files": 0,
+          "last_quota_update": 0,
+          "filesystem": {
+            "provider": 0,
+            "s3config": {},
+            "gcsconfig": {},
+            "azblobconfig": {},
+            "cryptconfig": {},
+            "sftpconfig": {}
+          },
+          "virtual_path": "/nfs",
+          "quota_size": -1,
+          "quota_files": -1
+        },
+        {
+          "id": 2,
+          "name": "gcs",
+          "used_quota_size": 0,
+          "used_quota_files": 0,
+          "last_quota_update": 0,
+          "filesystem": {
+            "provider": 2,
+            "s3config": {},
+            "gcsconfig": {
+              "bucket": "{{bucket_id.stdout}}",
+              "credentials": {},
+              "automatic_credentials": 1,
+              "key_prefix": "demo/"
+            },
+            "azblobconfig": {},
+            "cryptconfig": {},
+            "sftpconfig": {}
+          },
+          "virtual_path": "/gcs",
+          "quota_size": -1,
+          "quota_files": -1
+        }
+      ],
+      "filesystem": {
+        "provider": 0,
+        "s3config": {
+          "access_secret": {}
+        },
+        "gcsconfig": {
+          "credentials": {}
+        },
+        "azblobconfig": {
+          "account_key": {},
+          "sas_url": {}
+        },
+        "cryptconfig": {
+          "passphrase": {}
+        },
+        "sftpconfig": {
+          "password": {},
+          "private_key": {}
+        }
+      }
+    }
+  ],
+  "folders": [
+    {
+      "id": 1,
+      "name": "nfs",
+      "mapped_path": "/nfs",
+      "used_quota_size": 0,
+      "used_quota_files": 0,
+      "last_quota_update": 0,
+      "users": [
+        "{{ftp_demo_user.stdout}}"
+      ],
+      "filesystem": {
+        "provider": 0,
+        "s3config": {},
+        "gcsconfig": {},
+        "azblobconfig": {},
+        "cryptconfig": {},
+        "sftpconfig": {}
+      }
+    },
+    {
+      "id": 2,
+      "name": "gcs",
+      "used_quota_size": 0,
+      "used_quota_files": 0,
+      "last_quota_update": 0,
+      "users": [
+        "{{ftp_demo_user.stdout}}"
+      ],
+      "filesystem": {
+        "provider": 2,
+        "s3config": {},
+        "gcsconfig": {
+          "bucket": "{{bucket_id.stdout}}",
+          "credentials": {},
+          "automatic_credentials": 1,
+          "key_prefix": "demo/"
+        },
+        "azblobconfig": {},
+        "cryptconfig": {},
+        "sftpconfig": {}
+      }
+    }
+  ],
+  "admins": [
+    {
+      "id": 1,
+      "status": 1,
+      "username": "{{ftp_webadmin_user.stdout}}",
+      "password": "{{ftp_webadmin_password.stdout}}",
+      "permissions": [
+        "*"
+      ],
+      "filters": {
+        "totp_config": {
+          "secret": {}
+        }
+      },
+      "created_at": {{ansible_date_time.epoch}},
+      "updated_at": {{ansible_date_time.epoch}},
+      "last_login": {{ansible_date_time.epoch}}
+    }
+  ],
+  "api_keys": [],
+  "shares": [],
+  "version": 10
+}

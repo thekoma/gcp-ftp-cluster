@@ -95,14 +95,13 @@ resource "google_secret_manager_secret" "cookie_key" {
   project = "${var.project_id}-${random_id.project.hex}"
   secret_id = "cookie_key"
   replication { automatic = true }
+  depends_on = [ module.project-services ]
 }
 
 resource "google_secret_manager_secret_version" "cookie_key_v1" {
   secret      = google_secret_manager_secret.cookie_key.name
   secret_data = random_id.cookie_key.hex
-  depends_on = [
-    random_id.cookie_key
-  ]
+  depends_on = [ random_id.cookie_key, google_secret_manager_secret.cookie_key ]
 }
 
 resource "google_secret_manager_secret_iam_member" "cookie_key_member" {
@@ -115,4 +114,165 @@ resource "google_secret_manager_secret_iam_member" "cookie_key_member" {
     google_storage_bucket.ansible,
     data.google_service_account.ftp
   ]
+}
+
+
+# NFS Server
+
+resource "google_secret_manager_secret" "nfs_server" {
+  project = "${var.project_id}-${random_id.project.hex}"
+  secret_id = "nfs_server"
+  replication { automatic = true }
+  depends_on = [ module.project-services ]
+}
+
+resource "google_secret_manager_secret_version" "nfs_server_v1" {
+  secret      = google_secret_manager_secret.nfs_server.name
+  secret_data = google_filestore_instance.ftp.networks[0].ip_addresses[0]
+  depends_on = [ google_filestore_instance.ftp ]
+}
+
+resource "google_secret_manager_secret_iam_member" "nfs_server_member" {
+  project = "${var.project_id}-${random_id.project.hex}"
+  secret_id = google_secret_manager_secret.nfs_server.secret_id
+  role = "roles/secretmanager.secretAccessor"
+  member = "serviceAccount:${data.google_service_account.ftp.email}"
+  depends_on = [
+    module.project-services,
+    google_storage_bucket.ansible,
+    data.google_service_account.ftp
+  ]
+}
+
+
+# NFS Server Mountpoint
+
+resource "google_secret_manager_secret" "nfs_server_mount" {
+  project = "${var.project_id}-${random_id.project.hex}"
+  secret_id = "nfs_server_mount"
+  replication { automatic = true }
+  depends_on = [ module.project-services ]
+}
+
+resource "google_secret_manager_secret_version" "nfs_server_mount_v1" {
+  secret      = google_secret_manager_secret.nfs_server_mount.name
+  secret_data = google_filestore_instance.ftp.file_shares[0].name
+  depends_on = [ google_filestore_instance.ftp ]
+}
+
+resource "google_secret_manager_secret_iam_member" "nfs_server_mount_member" {
+  project = "${var.project_id}-${random_id.project.hex}"
+  secret_id = google_secret_manager_secret.nfs_server_mount.secret_id
+  role = "roles/secretmanager.secretAccessor"
+  member = "serviceAccount:${data.google_service_account.ftp.email}"
+  depends_on = [
+    module.project-services,
+    google_storage_bucket.ansible,
+    data.google_service_account.ftp
+  ]
+}
+# FTP User
+resource "google_secret_manager_secret" "ftp_demo_user" {
+  project = "${var.project_id}-${random_id.project.hex}"
+  secret_id = "ftp_demo_user"
+  replication { automatic = true }
+  depends_on = [ module.project-services ]
+}
+
+resource "google_secret_manager_secret_version" "ftp_demo_user_v1" {
+  secret      = google_secret_manager_secret.ftp_demo_user.name
+  secret_data = var.ftp_demo_user
+}
+
+resource "google_secret_manager_secret_iam_member" "ftp_demo_user_member" {
+  project = "${var.project_id}-${random_id.project.hex}"
+  secret_id = google_secret_manager_secret.ftp_demo_user.secret_id
+  role = "roles/secretmanager.secretAccessor"
+  member = "serviceAccount:${data.google_service_account.ftp.email}"
+  depends_on = [ module.project-services,data.google_service_account.ftp ]
+}
+
+# FTP Password
+resource "google_secret_manager_secret" "ftp_demo_password" {
+  project = "${var.project_id}-${random_id.project.hex}"
+  secret_id = "ftp_demo_password"
+  replication { automatic = true }
+  depends_on = [ module.project-services ]
+}
+
+resource "google_secret_manager_secret_version" "ftp_demo_password_v1" {
+  secret      = google_secret_manager_secret.ftp_demo_password.name
+  secret_data = bcrypt(var.ftp_demo_password, 10) 
+}
+
+resource "google_secret_manager_secret_iam_member" "ftp_demo_password_member" {
+  project = "${var.project_id}-${random_id.project.hex}"
+  secret_id = google_secret_manager_secret.ftp_demo_password.secret_id
+  role = "roles/secretmanager.secretAccessor"
+  member = "serviceAccount:${data.google_service_account.ftp.email}"
+  depends_on = [ module.project-services, data.google_service_account.ftp ]
+}
+
+
+# FTP Pubkey
+resource "google_secret_manager_secret" "ftp_demo_pubkey" {
+  project = "${var.project_id}-${random_id.project.hex}"
+  secret_id = "ftp_demo_pubkey"
+  replication { automatic = true }
+  depends_on = [ module.project-services ]
+}
+
+resource "google_secret_manager_secret_version" "ftp_demo_pubkey_v1" {
+  secret      = google_secret_manager_secret.ftp_demo_pubkey.name
+  secret_data = var.ftp_demo_pubkey
+}
+
+resource "google_secret_manager_secret_iam_member" "ftp_demo_pubkey_member" {
+  project = "${var.project_id}-${random_id.project.hex}"
+  secret_id = google_secret_manager_secret.ftp_demo_pubkey.secret_id
+  role = "roles/secretmanager.secretAccessor"
+  member = "serviceAccount:${data.google_service_account.ftp.email}"
+  depends_on = [ module.project-services, data.google_service_account.ftp ]
+}
+
+# FTP WebAdmin User
+resource "google_secret_manager_secret" "ftp_webadmin_user" {
+  project = "${var.project_id}-${random_id.project.hex}"
+  secret_id = "ftp_webadmin_user"
+  replication { automatic = true }
+  depends_on = [ module.project-services ]
+}
+
+resource "google_secret_manager_secret_version" "ftp_webadmin_user_v1" {
+  secret      = google_secret_manager_secret.ftp_webadmin_user.name
+  secret_data = var.ftp_webadmin_user
+}
+
+resource "google_secret_manager_secret_iam_member" "ftp_webadmin_user_member" {
+  project = "${var.project_id}-${random_id.project.hex}"
+  secret_id = google_secret_manager_secret.ftp_webadmin_user.secret_id
+  role = "roles/secretmanager.secretAccessor"
+  member = "serviceAccount:${data.google_service_account.ftp.email}"
+  depends_on = [ module.project-services, data.google_service_account.ftp ]
+}
+
+# FTP WebAdmin Password
+resource "google_secret_manager_secret" "ftp_webadmin_password" {
+  project = "${var.project_id}-${random_id.project.hex}"
+  secret_id = "ftp_webadmin_password"
+  replication { automatic = true }
+  depends_on = [ module.project-services ]
+}
+
+resource "google_secret_manager_secret_version" "ftp_webadmin_password_v1" {
+  secret      = google_secret_manager_secret.ftp_webadmin_password.name
+  secret_data = bcrypt(var.ftp_webadmin_password, 10)
+}
+
+resource "google_secret_manager_secret_iam_member" "ftp_webadmin_password_member" {
+  project = "${var.project_id}-${random_id.project.hex}"
+  secret_id = google_secret_manager_secret.ftp_webadmin_password.secret_id
+  role = "roles/secretmanager.secretAccessor"
+  member = "serviceAccount:${data.google_service_account.ftp.email}"
+  depends_on = [ module.project-services, data.google_service_account.ftp ]
 }

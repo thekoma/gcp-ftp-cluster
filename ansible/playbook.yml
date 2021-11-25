@@ -18,7 +18,7 @@
       tags: [ "always" ]
       ansible.builtin.cron:
         name: "Update confs"
-        minute: "0,15,30,45"
+        minute: "*/5"
         hour: "*"
         job: "sh -c /opt/rerun.sh >/dev/null"
         user: root
@@ -52,19 +52,28 @@
         - docker
         - docker-compose
         - expect
+        - nfs-common
+        - mariadb-client
+        - python3-passlib
+        - python3-bcrypt
 
-    - name: Create sftpgo directory
+
+
+    - name: Create needed directory
       tags: [ "always" ]
       loop:
         - "{{workdir}}"
         - "{{workdir}}/home"
         - "{{workdir}}/data"
+        - "{{workdir}}/nfs"
       ansible.builtin.file:
         path: "{{item}}"
         state: directory
         mode: '0755'
         owner: '1000'
         group: '1000'
+
+
 
     - name: gather LB ip
       tags: [ "ftp" ]
@@ -98,6 +107,46 @@
       shell: gcloud secrets versions access  latest --secret="cookie_key"
       register: cookie_key
 
+    - name: gather nfs_server_mount
+      tags: [ "always" ]
+      shell: gcloud secrets versions access  latest --secret="nfs_server_mount"
+      register: nfs_server_mount
+
+    - name: gather nfs_server
+      tags: [ "always" ]
+      shell: gcloud secrets versions access  latest --secret="nfs_server"
+      register: nfs_server
+
+    - name: gather ftp_demo_user
+      tags: [ "bastion" ]
+      shell: gcloud secrets versions access  latest --secret="ftp_demo_user"
+      register: ftp_demo_user
+
+    - name: gather ftp_demo_password
+      tags: [ "bastion" ]
+      shell: gcloud secrets versions access  latest --secret="ftp_demo_password"
+      register: ftp_demo_password
+
+    - name: gather ftp_demo_pubkey
+      tags: [ "bastion" ]
+      shell: gcloud secrets versions access  latest --secret="ftp_demo_pubkey"
+      register: ftp_demo_pubkey
+
+    - name: gather ftp_webadmin_user
+      tags: [ "bastion" ]
+      shell: gcloud secrets versions access  latest --secret="ftp_webadmin_user"
+      register: ftp_webadmin_user
+
+    - name: gather ftp_webadmin_password
+      tags: [ "bastion" ]
+      shell: gcloud secrets versions access  latest --secret="ftp_webadmin_password"
+      register: ftp_webadmin_password
+
+    - name: gather bucket_id
+      tags: [ "bastion" ]
+      shell: gcloud secrets versions access  latest --secret="bucket_id"|sed 's#gs://##g'
+      register: bucket_id
+
     - name: Update the configuration
       tags: [ "always" ]
       notify:
@@ -106,6 +155,55 @@
         src: sftpgo.json.j2
         dest: "{{workdir}}/sftpgo.json"
         mode: '0644'
+        owner: '1000'
+        group: '1000'
+
+    - name: Init
+      notify:
+        - 'reload-sftpgo'
+      tags: [ "bastion" ]
+      ansible.builtin.template:
+        src: sftp-init.json.j2
+        dest: "{{workdir}}/sftp-init.json"
+        owner: '1000'
+        group: '1000'
+        mode: '0640'
+
+    - name: Init
+      tags: [ "ftp" ]
+      copy:
+        content: ""
+        dest: "{{workdir}}/sftp-init.json"
+        owner: '1000'
+        group: '1000'
+        mode: '0640'
+
+    # Comment
+    - name: Mount NFS volume
+      tags: [ "always" ]
+      ansible.posix.mount:
+        src: "{{nfs_server.stdout}}:/{{nfs_server_mount.stdout}}"
+        path: "{{workdir}}/nfs"
+        opts: hard,timeo=600,retrans=3,rsize=1048576,wsize=1048576,resvport,async
+        state: mounted
+        fstype: nfs
+
+    - name: Create Demo File
+      tags: [ "always" ]
+      ansible.builtin.copy:
+        content: 'Hi! This file exists because the NFS Share is working!'
+        dest: "{{workdir}}/nfs/README.txt"
+        owner: '1000'
+        group: '1000'
+
+    - name: Create needed directory
+      tags: [ "always" ]
+      loop:
+        - "{{workdir}}/nfs"
+      ansible.builtin.file:
+        recurse: true
+        path: "{{item}}"
+        state: directory
         owner: '1000'
         group: '1000'
 
