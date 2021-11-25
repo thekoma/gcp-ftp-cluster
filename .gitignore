@@ -40,3 +40,4 @@ tmp
 venv
 *.log
 _custom.tf
+*.ignore
