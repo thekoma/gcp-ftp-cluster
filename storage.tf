@@ -6,6 +6,7 @@ resource "google_storage_bucket" "ansible" {
   name = "ansible-${random_id.suffix.hex}"
   uniform_bucket_level_access = true
   depends_on = [ module.project-services ]
+  force_destroy = true
 }
 
 resource "google_storage_bucket_object" "playbook" {
