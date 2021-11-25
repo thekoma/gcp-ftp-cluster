@@ -1,15 +1,15 @@
 data "google_client_openid_userinfo" "me" {
 }
-
+output me {
+  value = "Operating as: ${data.google_client_openid_userinfo.me.email}"
+}
 resource "google_project_iam_member" "sa_iap_admin" {
   project = "${var.project_id}-${random_id.project.hex}"
   role    = "roles/iap.admin"
   member = length(regexall(".*gserviceaccount.com$", data.google_client_openid_userinfo.me.email)) > 0 ? "serviceAccount:${data.google_client_openid_userinfo.me.email}" : "user:${data.google_client_openid_userinfo.me.email}"
-
   depends_on = [
     module.project-services
   ]
-
 }
 
 resource "google_project_organization_policy" "public_ip_for_vm" {
