@@ -1,8 +1,8 @@
 # FTP loadbalanced Demo
 
-### Features
+## Features
 
-- Grant correct Roles to the service account being used 
+- Grant correct Roles to the service account being used
 - Set Policy at project level to enable IP and other limitations
 - Create The project in a specific region/zone
 - Link the project to the correct Billing
@@ -24,25 +24,26 @@
 - Create/Manage a DNS Zone to simplify connection
 - Added Recap Output
 
-### Todo
+## Todo
 
 - ~~Write an API call-out to configure the inner part of sftpgo~~
 - ~~Create FileStore to produce a common datastore instead of gsBucket (to prove alternative way to customer)~~
 - ~~Manage a DNS zone to provide a user readable access~~
 
-### Needed steps:
+## Needed steps
 
-Your user or service account must have those roles at Folder/Root level 
+Your user or service account must have those roles at Folder/Root level
 (probably you need less than that but I didn't have time to check):
 
 - IAP Policy Admin
 - Billing Account Administrator
 - Project Creator
 
-### Known Problems/Bugs
+## Known Problems/Bugs
 
 - Due to the API being faster to say "done" than the actual "done state" you could encounter errors as such:
-  ```
+
+  ```log
   ╷
   │ Error: Error, failed to create instance ftp-INSTANCE: googleapi: Error 400: Invalid request: Organization Policy check failure: the authorized networks of this instance violates the constraints/sql.restrictAuthorizedNetworks enforced at the 0123456789 project.., invalid
   │
@@ -125,5 +126,6 @@ Your user or service account must have those roles at Folder/Root level
   │   41: resource "google_compute_instance_from_template" "compute_instance" {
   │
   ```
+
   If this is the case, just wait 30 seconds and relaunch the apply. It should go right after.
   Note: Probably adding some sleep we can solve this problem. Dependency didn't di the trick.
