@@ -3,18 +3,21 @@ resource "google_dns_managed_zone" "ftp_zone_create" {
   name        = var.dns_zone_name
   dns_name    = var.dns_zone_value
   visibility =  var.dns_zone_visibility
+  depends_on = [ module.project-services ]
+  project = var.dns_project_id
 }
 
 data "google_dns_managed_zone" "ftp_zone" {
   name = var.dns_zone_name
   project = var.dns_project_id
+  depends_on = [ module.project-services ]
 }
 
 locals {
   ftprecord = var.create_dns_zone ? "${var.dns_record_name_bastion}.${google_dns_managed_zone.ftp_zone_create[0].dns_name}" : "${var.dns_record_name_bastion}.${data.google_dns_managed_zone.ftp_zone.dns_name}"
   haftprecord = var.create_dns_zone ? "${var.dns_record_name_lb}.${google_dns_managed_zone.ftp_zone_create[0].dns_name}" : "${var.dns_record_name_lb}.${data.google_dns_managed_zone.ftp_zone.dns_name}"
   zone_name = var.create_dns_zone ? google_dns_managed_zone.ftp_zone_create[0].name : data.google_dns_managed_zone.ftp_zone.name
-  
+  depends_on = [ module.project-services ]
 }
 
 resource "google_dns_record_set" "haftp" {

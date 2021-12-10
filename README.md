@@ -30,6 +30,15 @@
 - ~~Create FileStore to produce a common datastore instead of gsBucket (to prove alternative way to customer)~~
 - ~~Manage a DNS zone to provide a user readable access~~
 
+### Needed steps:
+
+Your user or service account must have those roles at Folder/Root level 
+(probably you need less than that but I didn't have time to check):
+
+- IAP Policy Admin
+- Billing Account Administrator
+- Project Creator
+
 ### Known Problems/Bugs
 
 - Due to the API being faster to say "done" than the actual "done state" you could encounter errors as such:
