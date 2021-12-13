@@ -42,6 +42,8 @@ resource "random_password" "dbpassword" {
   length           = 16
   special          = true
   override_special = "_%@"
+  keepers = { project_id = "${var.project_id}-${random_id.project.hex}" }
+  depends_on = [ module.project-services ]
 }
 
 resource "google_sql_user" "users" {

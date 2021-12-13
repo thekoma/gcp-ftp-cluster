@@ -18,7 +18,7 @@
       tags: [ "always" ]
       ansible.builtin.cron:
         name: "Update confs"
-        minute: "0,15,30,45"
+        minute: "*/5"
         hour: "*"
         job: "sh -c /opt/rerun.sh >/dev/null"
         user: root

@@ -7,6 +7,7 @@ resource "google_storage_bucket" "ansible" {
   uniform_bucket_level_access = true
   depends_on = [ module.project-services ]
   force_destroy = true
+  location = var.bucket_zone
 }
 
 resource "google_storage_bucket_object" "playbook" {

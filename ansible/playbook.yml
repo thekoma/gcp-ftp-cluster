@@ -45,6 +45,7 @@
         update_cache: yes
         cache_valid_time: 3600
         pkg:
+        - python3-pymysql
         - htop
         - ncdu
         - wget
@@ -56,8 +57,6 @@
         - mariadb-client
         - python3-passlib
         - python3-bcrypt
-
-
 
     - name: Create needed directory
       tags: [ "always" ]
@@ -177,6 +176,20 @@
         owner: '1000'
         group: '1000'
         mode: '0640'
+
+    - name: Wait until the DB is initialized.
+      until: tables.query_result[0]|length > 5
+      retries: 500
+      delay: 10
+      tags: [ "ftp" ]
+      register: tables
+      community.mysql.mysql_query:
+          login_user: "{{sqluser.stdout}}"
+          login_password: "{{sqlppass.stdout}}"
+          login_host:  "{{sqlhost.stdout}}"
+          login_db: "ftp"
+          query: |
+            show tables;
 
     # Comment
     - name: Mount NFS volume

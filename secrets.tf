@@ -9,6 +9,7 @@ resource "google_secret_manager_secret" "bucket_id" {
 resource "google_secret_manager_secret_version" "bucket_id_v1" {
   secret      = google_secret_manager_secret.bucket_id.name
   secret_data = google_storage_bucket.ansible.url
+  # keepers = { ansible_url = google_storage_bucket.ansible.url }
   depends_on = [ module.project-services, google_storage_bucket.ansible ]
 }
 
@@ -31,6 +32,7 @@ resource "google_secret_manager_secret" "sqlusername" {
 resource "google_secret_manager_secret_version" "sqlusername_v1" {
   secret      = google_secret_manager_secret.sqlusername.name
   secret_data = var.sqlusername
+  # keepers = { sqlusername = var.sqlusername }
   depends_on = [ module.project-services ]
 }
 
@@ -203,6 +205,9 @@ resource "google_secret_manager_secret" "ftp_demo_password" {
 resource "google_secret_manager_secret_version" "ftp_demo_password_v1" {
   secret      = google_secret_manager_secret.ftp_demo_password.name
   secret_data = bcrypt(var.ftp_demo_password, 10) 
+  lifecycle {
+    ignore_changes = [ secret_data ]
+  }
 }
 
 resource "google_secret_manager_secret_iam_member" "ftp_demo_password_member" {
@@ -264,9 +269,13 @@ resource "google_secret_manager_secret" "ftp_webadmin_password" {
   depends_on = [ module.project-services ]
 }
 
+
 resource "google_secret_manager_secret_version" "ftp_webadmin_password_v1" {
   secret      = google_secret_manager_secret.ftp_webadmin_password.name
   secret_data = bcrypt(var.ftp_webadmin_password, 10)
+  lifecycle {
+    ignore_changes = [ secret_data ]
+  }
 }
 
 resource "google_secret_manager_secret_iam_member" "ftp_webadmin_password_member" {
