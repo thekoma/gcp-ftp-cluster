@@ -54,7 +54,7 @@ resource "google_filestore_instance" "ftp" {
     modes   = ["MODE_IPV4"]
   }
     depends_on = [ module.project-services, google_project_organization_policy.peering ]
-  }
+}
 
 output "nfs" {
   value = google_filestore_instance.ftp
